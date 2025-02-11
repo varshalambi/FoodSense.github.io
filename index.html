@@ -1,330 +1,449 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodSense - AI-Powered Food Label Analysis</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodSense - AI-Powered Food Label Analysis</title>
+  <!-- AOS Animation Library -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+    /* Sticky Navigation Bar */
+    header.navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(46, 125, 50, 0.9);
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar nav ul {
+      display: flex;
+      list-style: none;
+      justify-content: center;
+      padding: 1rem;
+      align-items: center;
+    }
+    .navbar nav ul li {
+      margin: 0 1rem;
+    }
+    .navbar nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .navbar nav ul li a:hover {
+      color: #FFD700;
+    }
+    .dark-mode-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .dark-mode-toggle:hover {
+      color: #FFD700;
+    }
 
-        .hero {
-            height: 100vh;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(76, 175, 80, 0.3) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(129, 199, 132, 0.3) 0%, transparent 40%),
-                linear-gradient(135deg, #2E7D32, #4CAF50, #81C784);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    /* Hero Section with Animated Gradient */
+    .hero {
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      overflow: hidden;
+      background: linear-gradient(135deg, #2E7D32, #4CAF50, #81C784);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L0 0 L100 0 Z' fill='%2381C784' fill-opacity='0.1'/%3E%3C/svg%3E") repeat;
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.5rem;
+    }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            background: 
-                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L0 0 L100 0 Z' fill='%2381C784' fill-opacity='0.1'/%3E%3C/svg%3E") repeat;
-            z-index: 1;
-        }
+    /* Mascot Styles */
+    .mascot {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 200px;
+      animation: bounce 2s infinite;
+      z-index: 2;
+    }
+    .character {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .head {
+      background: #FFF;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .eye {
+      width: 12px;
+      height: 16px;
+      background: #333;
+      border-radius: 50%;
+      position: absolute;
+      top: 30px;
+      animation: blink 4s infinite;
+    }
+    .eye.left {
+      left: 20px;
+    }
+    .eye.right {
+      right: 20px;
+    }
+    .mouth {
+      width: 30px;
+      height: 12px;
+      border-radius: 0 0 15px 15px;
+      background: #FF9999;
+      position: absolute;
+      bottom: 20px;
+      left: 25px;
+    }
+    .body {
+      width: 70px;
+      height: 90px;
+      background: #E8F5E9;
+      border-radius: 35px;
+      margin: -10px auto 0;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .arm {
+      width: 20px;
+      height: 60px;
+      background: #E8F5E9;
+      position: absolute;
+      top: 10px;
+      border-radius: 10px;
+    }
+    .arm.left {
+      left: -15px;
+      transform: rotate(-15deg);
+    }
+    .arm.right {
+      right: -15px;
+      transform: rotate(15deg);
+    }
+    .leg {
+      width: 25px;
+      height: 40px;
+      background: #E8F5E9;
+      position: absolute;
+      bottom: -35px;
+      border-radius: 12px;
+    }
+    .leg.left {
+      left: 10px;
+    }
+    .leg.right {
+      right: 10px;
+    }
+    .speech-bubble {
+      background: white;
+      color: #2E7D32;
+      padding: 12px 20px;
+      border-radius: 20px;
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      animation: fadeInOut 2s infinite;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      font-weight: bold;
+      z-index: 2;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) translateX(-50%); }
+      50% { transform: translateY(-20px) translateX(-50%); }
+    }
+    @keyframes blink {
+      0%, 96%, 98%, 100% { transform: scaleY(1); }
+      97%, 99% { transform: scaleY(0.1); }
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      50% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
 
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
+    /* Main Content */
+    main {
+      margin-top: 70px; /* To account for the fixed navbar */
+    }
+    .section {
+      padding: 100px 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    /* Alternate section background colors */
+    .section:nth-child(even) {
+      background: #E8F5E9;
+    }
+    .section:nth-child(odd) {
+      background: #ffffff;
+    }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-        }
+    /* Features Section - Using CSS Grid */
+    .features-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+    }
 
-        .mascot {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 200px;
-            animation: bounce 2s infinite;
-        }
+    /* Team Section */
+    .about-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .team-member {
+      text-align: left;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .team-member:hover {
+      transform: translateY(-5px);
+    }
+    .team-member h3 {
+      color: #4CAF50;
+      margin-bottom: 1rem;
+    }
 
-        .character {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
+    /* Get Started Section */
+    .get-started {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .get-started button {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background 0.3s ease;
+      margin-top: 20px;
+    }
+    .get-started button:hover {
+      transform: scale(1.05);
+      background: #2E7D32;
+    }
 
-        .head {
-            background: #FFF;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            position: relative;
-            margin: 0 auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .eye {
-            width: 12px;
-            height: 16px;
-            background: #333;
-            border-radius: 50%;
-            position: absolute;
-            top: 30px;
-            animation: blink 4s infinite;
-        }
-
-        .eye.left { left: 20px; }
-        .eye.right { right: 20px; }
-
-        .mouth {
-            width: 30px;
-            height: 12px;
-            border-radius: 0 0 15px 15px;
-            background: #FF9999;
-            position: absolute;
-            bottom: 20px;
-            left: 25px;
-        }
-
-        .body {
-            width: 70px;
-            height: 90px;
-            background: #E8F5E9;
-            border-radius: 35px;
-            margin: -10px auto 0;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .arm {
-            width: 20px;
-            height: 60px;
-            background: #E8F5E9;
-            position: absolute;
-            top: 10px;
-            border-radius: 10px;
-        }
-
-        .arm.left {
-            left: -15px;
-            transform: rotate(-15deg);
-        }
-
-        .arm.right {
-            right: -15px;
-            transform: rotate(15deg);
-        }
-
-        .leg {
-            width: 25px;
-            height: 40px;
-            background: #E8F5E9;
-            position: absolute;
-            bottom: -35px;
-            border-radius: 12px;
-        }
-
-        .leg.left {
-            left: 10px;
-        }
-
-        .leg.right {
-            right: 10px;
-        }
-
-        .speech-bubble {
-            background: white;
-            color: #2E7D32;
-            padding: 12px 20px;
-            border-radius: 20px;
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            animation: fadeInOut 2s infinite;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            font-weight: bold;
-        }
-
-        .section {
-            padding: 100px 20px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .section:nth-child(odd) {
-            background: #E8F5E9;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 1rem;
-            max-width: 300px;
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .features-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .team-member {
-            text-align: left;
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .team-member:hover {
-            transform: translateY(-5px);
-        }
-
-        .team-member h3 {
-            color: #4CAF50;
-            margin-bottom: 1rem;
-        }
-
-        .about-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) translateX(-50%); }
-            50% { transform: translateY(-20px) translateX(-50%); }
-        }
-
-        @keyframes blink {
-            0%, 96%, 98%, 100% { transform: scaleY(1); }
-            97%, 99% { transform: scaleY(0.1); }
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
-            50% { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            .feature-card {
-                width: 100%;
-                margin: 1rem 0;
-            }
-        }
-    </style>
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background: #121212;
+      color: #e0e0e0;
+    }
+    body.dark-mode .hero {
+      background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
+    }
+    body.dark-mode .navbar {
+      background: rgba(18, 18, 18, 0.9);
+    }
+    body.dark-mode .feature-card,
+    body.dark-mode .team-member {
+      background: #1e1e1e;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    }
+    body.dark-mode .feature-card h2,
+    body.dark-mode .team-member h3 {
+      color: #81C784;
+    }
+    body.dark-mode .speech-bubble {
+      background: #333;
+      color: #81C784;
+    }
+    body.dark-mode .get-started button {
+      background: #388e3c;
+    }
+    body.dark-mode .get-started button:hover {
+      background: #2e7d32;
+    }
+  </style>
 </head>
 <body>
-    <div class="hero">
-        <div class="hero-content">
-            <h1>FoodSense</h1>
-            <p>AI-Powered Food Label Analysis</p>
-        </div>
-        <div class="mascot">
-            <div class="speech-bubble">Let's eat healthy! 🥗</div>
-            <div class="character">
-                <div class="head">
-                    <div class="eye left"></div>
-                    <div class="eye right"></div>
-                    <div class="mouth"></div>
-                </div>
-                <div class="body">
-                    <div class="arm left"></div>
-                    <div class="arm right"></div>
-                    <div class="leg left"></div>
-                    <div class="leg right"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <!-- Sticky Navigation Bar -->
+  <header class="navbar">
+    <nav>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#get-started">Get Started</a></li>
+        <li><button class="dark-mode-toggle" id="darkModeToggle">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
 
-    <div class="section">
-        <div class="features-container">
-            <div class="feature-card" data-aos="fade-up">
-                <h2>AI-Powered Analysis</h2>
-                <p>Our advanced AI deciphers complex ingredients and provides clear, actionable insights about your food.</p>
-            </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                <h2>Real Calorie Tracking</h2>
-                <p>Get accurate calorie information and nutritional insights tailored to your needs.</p>
-            </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                <h2>Personalized Insights</h2>
-                <p>Receive customized recommendations based on your health goals and dietary preferences.</p>
-            </div>
-        </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>FoodSense</h1>
+      <p>AI-Powered Food Label Analysis</p>
     </div>
-
-    <div class="section">
-        <div class="about-container">
-            <h2 data-aos="zoom-in">Meet the Team</h2>
-            <div class="team-member" data-aos="fade-up">
-                <h3>Varsha</h3>
-                <p>Biomedical Engineering grad student at Rutgers University, passionate about AI and machine learning in healthcare. With expertise in biomedical research, Varsha brings technical depth to FoodSense's mission.</p>
-            </div>
-            <div class="team-member" data-aos="fade-up" data-aos-delay="100">
-                <h3>Aakanksha</h3>
-                <p>Biomedical Engineering undergrad at Boston University, combining technical knowledge with business strategy to revolutionize food transparency.</p>
-            </div>
-            <div class="team-member" data-aos="fade-up" data-aos-delay="200">
-                <p>"Today, health issues like diabetes, cancer, and obesity are on the rise, largely due to ultra-processed foods. Food labels are confusing and misleading. Even experts struggle to decode them.</p>
-                <p>This lack of transparency keeps people from making informed choices. That's why we created FoodSense, an AI-powered app that helps consumers truly understand what they're eating. Our app deciphers complex ingredients, tracks real calories, and provides personalized insights for smarter food choices.</p>
-                <p>As health awareness grows, people need simple, reliable tools—AI makes that possible. Our vision is to revolutionize how people interact with food, giving them the power to take control of their health."</p>
-            </div>
+    <div class="mascot">
+      <div class="speech-bubble">Let's eat healthy! 🥗</div>
+      <div class="character">
+        <div class="head">
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="mouth"></div>
         </div>
-    </div>
-
-    <div class="section">
-        <div data-aos="fade-right">
-            <h2>Get Started Today</h2>
-            <p>Join us in making smarter, healthier food choices!</p>
+        <div class="body">
+          <div class="arm left"></div>
+          <div class="arm right"></div>
+          <div class="leg left"></div>
+          <div class="leg right"></div>
         </div>
+      </div>
     </div>
+  </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 200
-        });
-    </script>
+  <!-- Main Content -->
+  <main>
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <div class="features-container">
+        <div class="feature-card" data-aos="fade-up">
+          <h2>AI-Powered Analysis</h2>
+          <p>Our advanced AI deciphers complex ingredients and provides clear, actionable insights about your food.</p>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <h2>Real Calorie Tracking</h2>
+          <p>Get accurate calorie information and nutritional insights tailored to your needs.</p>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <h2>Personalized Insights</h2>
+          <p>Receive customized recommendations based on your health goals and dietary preferences.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section" id="team">
+      <div class="about-container">
+        <h2 data-aos="zoom-in">Meet the Team</h2>
+        <div class="team-member" data-aos="fade-up">
+          <h3>Varsha</h3>
+          <p>Biomedical Engineering grad student at Rutgers University, passionate about AI and machine learning in healthcare. With expertise in biomedical research, Varsha brings technical depth to FoodSense's mission.</p>
+        </div>
+        <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+          <h3>Aakanksha</h3>
+          <p>Biomedical Engineering undergrad at Boston University, combining technical knowledge with business strategy to revolutionize food transparency.</p>
+        </div>
+        <div class="team-member" data-aos="fade-up" data-aos-delay="200">
+          <p>"Today, health issues like diabetes, cancer, and obesity are on the rise, largely due to ultra-processed foods. Food labels are confusing and misleading. Even experts struggle to decode them.</p>
+          <p>This lack of transparency keeps people from making informed choices. That's why we created FoodSense, an AI-powered app that helps consumers truly understand what they're eating. Our app deciphers complex ingredients, tracks real calories, and provides personalized insights for smarter food choices.</p>
+          <p>As health awareness grows, people need simple, reliable tools—AI makes that possible. Our vision is to revolutionize how people interact with food, giving them the power to take control of their health."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Get Started Section -->
+    <section class="section" id="get-started">
+      <div class="get-started" data-aos="fade-right">
+        <h2>Get Started Today</h2>
+        <p>Join us in making smarter, healthier food choices!</p>
+        <button>Sign Up Now</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 200
+    });
+
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      // Toggle the icon based on the mode
+      if (document.body.classList.contains('dark-mode')) {
+        darkModeToggle.textContent = '☀️';
+      } else {
+        darkModeToggle.textContent = '🌙';
+      }
+    });
+  </script>
 </body>
 </html>
+
